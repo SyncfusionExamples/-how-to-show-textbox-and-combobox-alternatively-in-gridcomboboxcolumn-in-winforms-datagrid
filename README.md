@@ -7,45 +7,45 @@ This example illustrates how to show TextBox and Combobox alternatively in GridC
 
 ```C#
 
-public partial class Form1 : Form
-{
-        public Form1()
-        {
-            InitializeComponent();
-            //Remove existing ComboBox Renderer
-            this.sfDataGrid1.CellRenderers.Remove("ComboBox");
-            //Add customized ComboBox Renderer
-            this.sfDataGrid1.CellRenderers.Add("ComboBox", new GridComboBoxCellRendererExt(sfDataGrid1));
-        }
-}
+ public partial class Form1 : Form
+ {
+     public Form1()
+     {
+         InitializeComponent();
+         //Remove existing ComboBox Renderer
+         this.sfDataGrid1.CellRenderers.Remove("ComboBox");
+         //Add customized ComboBox Renderer
+         this.sfDataGrid1.CellRenderers.Add("ComboBox", new GridComboBoxCellRendererExt(sfDataGrid1));
+     }
+ }
 
 public class GridComboBoxCellRendererExt : GridComboBoxCellRenderer
 {
-        private SfDataGrid dataGrid;
+    private SfDataGrid dataGrid;
 
-        public GridComboBoxCellRendererExt(SfDataGrid dataGrid) : base()
+    public GridComboBoxCellRendererExt(SfDataGrid dataGrid) : base()
+    {
+        this.dataGrid = dataGrid;
+    }
+
+    protected override void OnInitializeEditElement(DataColumnBase column, RowColumnIndex rowColumnIndex, SfComboBox uiElement)
+    {
+        base.OnInitializeEditElement(column, rowColumnIndex, uiElement);
+
+        if (column.GridColumn.MappingName == "ShipCityID")
         {
-            this.dataGrid = dataGrid;
-        }
+            //ShipCity Column display the TextBox cell and ComboBox alternative rows in SfDataGrid
 
-        protected override void OnInitializeEditElement(DataColumnBase column, RowColumnIndex rowColumnIndex, SfComboBox uiElement)
-        {
-            base.OnInitializeEditElement(column, rowColumnIndex, uiElement);
-
-            if (column.GridColumn.MappingName == "ShipCityID")
+            //Display the text box to edit the cell value instead of the combo box condition based. 
+            if (rowColumnIndex.RowIndex % 2 == 0)
             {
-                //ShipCity Column display the TextBox cell and ComboBox alternative rows in SfDataGrid
-
-                //Display the text box to edit the cell value instead of the combo box condition based. 
-                if (rowColumnIndex.RowIndex % 2 == 0)
-                {
-                    //To display the edit element as text box. 
-                    uiElement.DropDownStyle = DropDownStyle.DropDown;
-                    uiElement.DropDownButton.Visible = false;
-                }
+                //To display the edit element as text box. 
+                uiElement.DropDownStyle = DropDownStyle.DropDown;
+                uiElement.DropDownButton.Visible = false;
             }
-
         }
+
+    }
 }
 
 ```
@@ -58,17 +58,17 @@ this.sfDataGrid1.CurrentCellValidating += sfDataGrid1_CurrentCellValidating;
 
 void sfDataGrid1_CurrentCellValidating(object sender, CurrentCellValidatingEventArgs e)
 {
-            if (this.sfDataGrid1.CurrentCell.Column is GridComboBoxColumn && this.sfDataGrid1.CurrentCell.CellRenderer.CurrentCellRendererElement != null)
-            {
-                var shipCityName = this.sfDataGrid1.CurrentCell.CellRenderer.CurrentCellRendererElement.Text;
-                var shipCityDetails = orderInfo.ShipCityDetails.FirstOrDefault(city => city.ShipCityName == shipCityName);
+    if (this.sfDataGrid1.CurrentCell.Column is GridComboBoxColumn && this.sfDataGrid1.CurrentCell.CellRenderer.CurrentCellRendererElement != null)
+    {
+        var shipCityName = this.sfDataGrid1.CurrentCell.CellRenderer.CurrentCellRendererElement.Text;
+        var shipCityDetails = orderInfo.ShipCityDetails.FirstOrDefault(city => city.ShipCityName == shipCityName);
 
-                if (shipCityDetails == null && !string.IsNullOrEmpty(this.sfDataGrid1.CurrentCell.CellRenderer.CurrentCellRendererElement.Text))
-                {
-                    shipCityID++;
-                    orderInfo.ShipCityDetails.Add(new ShipCityDetails() { ShipCityName = this.sfDataGrid1.CurrentCell.CellRenderer.CurrentCellRendererElement.Text, ShipCityID = shipCityID });
-                }
-            }
+        if (shipCityDetails == null && !string.IsNullOrEmpty(this.sfDataGrid1.CurrentCell.CellRenderer.CurrentCellRendererElement.Text))
+        {
+            shipCityID++;
+            orderInfo.ShipCityDetails.Add(new ShipCityDetails() { ShipCityName = this.sfDataGrid1.CurrentCell.CellRenderer.CurrentCellRendererElement.Text, ShipCityID = shipCityID });
+        }
+    }
 }
 
 ```
